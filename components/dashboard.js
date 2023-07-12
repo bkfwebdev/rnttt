@@ -30,6 +30,11 @@ export default class Dashboard extends Component {
           title="Logout"
           onPress={() => this.signOut()}
         />
+          <Button
+          color="#3740FE"
+          title="Play Tic Toe"
+          onPress={() => this.props.navigation.navigate('MainScreen')}
+        />
       </View>
     );
   }

@@ -5,6 +5,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Login from './components/login';
 import Signup from './components/signup';
 import Dashboard from './components/dashboard';
+import MainScreen from './components/mainscreen';
+
 const Stack = createStackNavigator();
 function MyStack() {
   return (
@@ -23,7 +25,7 @@ function MyStack() {
       <Stack.Screen 
         name="Signup" 
         component={Signup} 
-        options={{ title: 'Signup' }}
+        options={{ title: 'Tic Tac Toe Signup' }}
       />       
       <Stack.Screen 
         name="Login" 
@@ -42,6 +44,10 @@ function MyStack() {
          { title: 'Dashboard', 
          headerLeft: null} 
        }
+      />
+      <Stack.Screen
+        name="MainScreen"
+        component={MainScreen}
       />
     </Stack.Navigator>
   );
