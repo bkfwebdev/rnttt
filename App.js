@@ -6,6 +6,7 @@ import Login from './components/login';
 import Signup from './components/signup';
 import Dashboard from './components/dashboard';
 import MainScreen from './components/mainscreen';
+import GameBoard from './components/gameboard';
 
 const Stack = createStackNavigator();
 function MyStack() {
@@ -48,6 +49,10 @@ function MyStack() {
       <Stack.Screen
         name="MainScreen"
         component={MainScreen}
+      />
+      <Stack.Screen
+      name = "GameBoard"
+      component = {GameBoard}
       />
     </Stack.Navigator>
   );

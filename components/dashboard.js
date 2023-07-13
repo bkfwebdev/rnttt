@@ -33,7 +33,7 @@ export default class Dashboard extends Component {
           <Button
           color="#3740FE"
           title="Play Tic Toe"
-          onPress={() => this.props.navigation.navigate('MainScreen')}
+          onPress={() => this.props.navigation.navigate('GameBoard')}
         />
       </View>
     );
