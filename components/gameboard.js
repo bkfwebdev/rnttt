@@ -1,16 +1,39 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, Button } from 'react-native';
-import firebase from '../database/firebase';
+import { StyleSheet, View, Image, ImageBackground, Text } from 'react-native';
+const {default: xImage } = await import('./resources/x.svg')
+const {default: oImage } = await import('./resources/o.svg')
+const xImageUri = Image.resolveAssetSource(xImage).uri
+const oImageUri = Image.resolveAssetSource(oImage).uri
 
 class GameBoard extends Component {
   constructor() {
     super();
-    this.state = { 
+    this.state = {
       uid: '',
       board: Array(9).fill(null),
-      currentPlayer: "X"
-    }  
+      currentPlayer: 'X',
+      winner: null,
+    };
   }
+
+  handleCellClick = (index) => {
+    const { board, currentPlayer, winner } = this.state;
+
+    if (board[index] || winner) {
+      return;
+    }
+
+    const newBoard = [...board];
+    newBoard[index] = currentPlayer;
+
+    const newWinner = this.calculateWinner(newBoard);
+
+    this.setState({
+      board: newBoard,
+      currentPlayer: currentPlayer === 'X' ? 'O' : 'X',
+      winner: newWinner,
+    });
+  };
 
   calculateWinner = (board) => {
     const winPatterns = [
@@ -23,76 +46,92 @@ class GameBoard extends Component {
       [0, 4, 8],
       [2, 4, 6],
     ];
-  
+
     for (let i = 0; i < winPatterns.length; i++) {
       const [a, b, c] = winPatterns[i];
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
         return board[a];
       }
     }
-  
+
     return null;
   };
 
-  handleCellClick = (index) => {
-    // Return early if the cell is already filled or the game is won
-    if (this.state.board[index] || this.calculateWinner(this.state.board)) {
-      return;
+  renderCell = (index) => {
+    const { board } = this.state;
+    const cellValue = board[index];
+    let backgroundImage;
+
+    if (cellValue === 'X') {
+      backgroundImage = xImageUri;
+    } else if (cellValue === 'O') {
+      backgroundImage = oImageUri;
     }
 
-    // Create a copy of the board and update the clicked cell with the current player's mark
-    const newBoard = [...this.state.board];
-    newBoard[index] = this.state.currentPlayer;
-
-    // Update the board state and toggle the current player
-    this.setState({
-      board: newBoard,
-      currentPlayer: this.state.currentPlayer === 'X' ? 'O' : 'X'
-    });
-  };
-
-  renderCell = (index) => {
     return (
-      <div key = {index} style = {styles.cellStyle} onClick={() => this.handleCellClick(index)}>
-        {this.state.board[index]}
+      <div
+        style={styles.cellStyle}
+        onPress={() => this.handleCellClick(index)}
+      >
+        {backgroundImage && (
+          <ImageBackground
+            source={backgroundImage}
+            style={{ flex: 1 }}
+            resizeMode="cover"
+          />
+        )}
       </div>
     );
   };
 
+  renderWinnerMessage = () => {
+    const { winner } = this.state;
+
+    if (winner) {
+      return <Text style={styles.winnerMessage}>{`Winner: ${winner}`}</Text>;
+    }
+
+    return null;
+  };
+
   render() {
-    const theWinner = this.calculateWinner(this.state.board);
-    const gameStatus = theWinner ? `Winner: ${theWinner}` : `Current Player: ${this.state.currentPlayer}`;
+    const { board } = this.state;
 
     return (
-
-        <View style = {styles.cellsContainer}>
-          {this.state.board.map((cell, index) => this.renderCell(index))}
-        </View>
-
+      <View style={styles.container}>
+        {this.renderWinnerMessage()}
+        {board.map((cell, index) => this.renderCell(index))}
+      </View>
     );
   }
 }
 
-export default GameBoard;
-
 const styles = StyleSheet.create({
-  cellsContainer: {
-    display: "flex",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 300, // Set a fixed width for the container
-    height: 300, // Set a fixed height for the container
+  container: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 300,
+    height: 300,
+    margin: 'auto'
   },
   cellStyle: {
-    width: 150, // Adjust the width of each cell as needed
-    height: 150, // Adjust the height of each cell as needed
-    borderStyle: "solid",
-    borderColor: "#000",
+    width: 100,
+    height: 100,
+    borderStyle: 'solid',
+    borderColor: '#000',
     borderWidth: 1,
-    justifyContent: "center",
-    backgroundColor: "#2986cc",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#2986cc',
+  },
+  winnerMessage: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
+
+export default GameBoard;
 

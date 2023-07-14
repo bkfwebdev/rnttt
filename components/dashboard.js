@@ -23,7 +23,7 @@ export default class Dashboard extends Component {
     return (
       <View style={styles.container}>
         <Text style = {styles.textStyle}>
-          Hello, {this.state.displayName}
+          Hello, {this.state.displayName} - user:{this.state.uid}
         </Text>
         <Button
           color="#3740FE"
