@@ -6,7 +6,7 @@ import Login from './components/login';
 import Signup from './components/signup';
 import Dashboard from './components/dashboard';
 import MainScreen from './components/mainscreen';
-import GameBoard from './components/gameboard';
+import GameBoard from './components/scratch';
 
 const Stack = createStackNavigator();
 function MyStack() {

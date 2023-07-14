@@ -1,41 +1,42 @@
-import React, { Component } from 'react';
-import { StyleSheet, View, Image, ImageBackground, Text } from 'react-native';
-const {default: xImage } = await import('./resources/x.svg')
-const {default: oImage } = await import('./resources/o.svg')
-const xImageUri = Image.resolveAssetSource(xImage).uri
-const oImageUri = Image.resolveAssetSource(oImage).uri
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 
-class GameBoard extends Component {
-  constructor() {
-    super();
-    this.state = {
-      uid: '',
-      board: Array(9).fill(null),
-      currentPlayer: 'X',
-      winner: null,
-    };
+const GameBoard = () => {
+  const [board, setBoard] = useState(Array(9).fill(null));
+  const [currentPlayer, setCurrentPlayer] = useState('X');
+  const [winner, setWinner] = useState(null);
+
+const handleCellClick = (index) => {
+  if (board[index] || winner) {
+    return;
   }
 
-  handleCellClick = (index) => {
-    const { board, currentPlayer, winner } = this.state;
+  const newBoard = [...board];
+  newBoard[index] = currentPlayer;
 
-    if (board[index] || winner) {
-      return;
-    }
+  const newWinner = calculateWinner(newBoard);
 
-    const newBoard = [...board];
-    newBoard[index] = currentPlayer;
+  setBoard(newBoard);
+  setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+  setWinner(newWinner);
 
-    const newWinner = this.calculateWinner(newBoard);
+  // Check for draw
+  const isDraw = newBoard.every((cell) => cell !== null);
+  if (isDraw && !newWinner) {
+    // Display alert and reset the board
+    Alert.alert("It's a draw!");
+    setBoard(Array(9).fill(null));
+    setWinner(null);
+  } else if (newWinner) {
+    // Display alert and reset the board
+    Alert.alert(`Winner: ${newWinner}`);
+    setBoard(Array(9).fill(null));
+    setWinner(null);
+  }
+};
 
-    this.setState({
-      board: newBoard,
-      currentPlayer: currentPlayer === 'X' ? 'O' : 'X',
-      winner: newWinner,
-    });
-  };
 
-  calculateWinner = (board) => {
+  const calculateWinner = (board) => {
     const winPatterns = [
       [0, 1, 2],
       [3, 4, 5],
@@ -49,7 +50,11 @@ class GameBoard extends Component {
 
     for (let i = 0; i < winPatterns.length; i++) {
       const [a, b, c] = winPatterns[i];
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+      if (
+        board[a] !== null &&
+        board[a] === board[b] &&
+        board[a] === board[c]
+      ) {
         return board[a];
       }
     }
@@ -57,54 +62,34 @@ class GameBoard extends Component {
     return null;
   };
 
-  renderCell = (index) => {
-    const { board } = this.state;
+  const renderCell = (index) => {
     const cellValue = board[index];
-    let backgroundImage;
-
-    if (cellValue === 'X') {
-      backgroundImage = xImageUri;
-    } else if (cellValue === 'O') {
-      backgroundImage = oImageUri;
-    }
 
     return (
-      <div
-        style={styles.cellStyle}
-        onPress={() => this.handleCellClick(index)}
+      <TouchableOpacity
+        onPress={() => handleCellClick(index)}
+        key={index}
       >
-        {backgroundImage && (
-          <ImageBackground
-            source={backgroundImage}
-            style={{ flex: 1 }}
-            resizeMode="cover"
-          />
-        )}
-      </div>
+        <Text style={styles.cellStyle}>{cellValue}</Text>
+      </TouchableOpacity>
     );
   };
 
-  renderWinnerMessage = () => {
-    const { winner } = this.state;
-
+  const renderWinnerMessage = () => {
     if (winner) {
-      return <Text style={styles.winnerMessage}>{`Winner: ${winner}`}</Text>;
+      Alert.alert(`Winner: ${winner}`);
     }
 
     return null;
   };
 
-  render() {
-    const { board } = this.state;
-
-    return (
-      <View style={styles.container}>
-        {this.renderWinnerMessage()}
-        {board.map((cell, index) => this.renderCell(index))}
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.container}>
+      {board.map((_, index) => renderCell(index))}
+      {renderWinnerMessage()}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -114,22 +99,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 300,
     height: 300,
-    margin: 'auto'
+    margin: 'auto',
   },
   cellStyle: {
-    width: 100,
-    height: 100,
+    width: 90,
+    height: 90,
     borderStyle: 'solid',
     borderColor: '#000',
     borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#2986cc',
-  },
-  winnerMessage: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
+    fontFamily: 'Impact',
+    fontSize: 70,
+    color: '#fff',
+    padding: 'auto',
+    textAlign: 'center',
   },
 });
 
