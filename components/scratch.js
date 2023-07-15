@@ -21,22 +21,27 @@ const handleCellClick = (index) => {
   setWinner(newWinner);
 
   // Check for draw
-  const isDraw = newBoard.every((cell) => cell !== null);
-  if (isDraw && !newWinner) {
-    console.log('draw');
+  const isDraw = (movesLeft(newBoard) == false) && (newWinner !== 'X' && newWinner !== 'O');
+  if (isDraw){
+    console.log('alert draw');
     // Display alert and reset the board
-    Alert.alert('update','Draw',[{text: 'OK', onPress: () => console.log('OK Pressed')}])
+    // Alert.alert('update','Draw',[{text: 'OK', onPress: () => console.log('OK Pressed')}])
+    alert('Draw')
     setBoard(Array(9).fill(null));
     setWinner(null);
   } else if (newWinner) {
-    console.log('winner is', newWinner);  
+    console.log('alert winner is', newWinner);  
     // Display alert and reset the board
-    Alert.alert('update',`Winner: ${winner}`,[{text: 'OK', onPress: () => console.log('OK Pressed')}])
+    // Alert.alert('update',`Winner: ${winner}`,[{text: 'OK', onPress: () => console.log('OK Pressed')}])
+    alert(`Winner: ${newWinner}`)
     setBoard(Array(9).fill(null));
     setWinner(null);
   }
 };
 
+  const movesLeft = (board) => {
+    return board.includes(null);
+}
 
   const calculateWinner = (board) => {
     const winPatterns = [
@@ -57,7 +62,7 @@ const handleCellClick = (index) => {
         board[a] === board[b] &&
         board[a] === board[c]
       ) {
-        console.log('winner is', board[a]);
+        //console.log('winner is', board[a]);
         return board[a];
       }
     }
@@ -115,4 +120,3 @@ const styles = StyleSheet.create({
 });
 
 export default GameBoard;
-
