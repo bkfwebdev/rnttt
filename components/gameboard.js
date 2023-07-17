@@ -1,60 +1,79 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
 const GameBoard = () => {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [currentPlayer, setCurrentPlayer] = useState('X');
   const [winner, setWinner] = useState(null);
+  const [gameEnded, setGameEnded] = useState(false);
 
-const handleCellClick = (index) => {
-  if (board[index] || winner) {
-    return;
-  }
+  useEffect(() => {
+    if (currentPlayer === 'O' && !winner && !gameEnded) {
+      makeComputerMove();
+    }
+  }, [currentPlayer, winner, gameEnded]);
 
-  const newBoard = [...board];
-  newBoard[index] = currentPlayer;
+  const handleCellClick = (index) => {
+    if (board[index] || winner || gameEnded) {
+      return;
+    }
 
-  const newWinner = calculateWinner(newBoard);
+    const newBoard = [...board];
+    newBoard[index] = currentPlayer;
 
-  setBoard(newBoard);
-  setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
-  setWinner(newWinner);
+    setBoard(newBoard);
+    setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
 
-  // Check for draw
-  const isDraw = newBoard.every((cell) => cell !== null);
-  if (isDraw && !newWinner) {
-    // Display alert and reset the board
-    Alert.alert("It's a draw!");
-    setBoard(Array(9).fill(null));
-    setWinner(null);
-  } else if (newWinner) {
-    // Display alert and reset the board
-    Alert.alert(`Winner: ${newWinner}`);
-    setBoard(Array(9).fill(null));
-    setWinner(null);
-  }
-};
+    const newWinner = calculateWinner(newBoard);
+    setWinner(newWinner);
 
+    if (newWinner) {
+      setGameEnded(true);
+    } else if (!newBoard.includes(null)) {
+      setGameEnded(true);
+    }
+  };
+
+  const makeComputerMove = () => {
+    const computerMove = getComputerMove(board);
+    if (computerMove !== null) {
+      setTimeout(() => {
+        handleCellClick(computerMove);
+      }, 500); // Delay computer move for visual effect
+    }
+  };
+
+  const getComputerMove = (board) => {
+    const emptyCells = [];
+    for (let i = 0; i < board.length; i++) {
+      if (!board[i]) {
+        emptyCells.push(i);
+      }
+    }
+
+    if (emptyCells.length > 0) {
+      const randomIndex = Math.floor(Math.random() * emptyCells.length);
+      return emptyCells[randomIndex];
+    }
+
+    return null;
+  };
 
   const calculateWinner = (board) => {
     const winPatterns = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
+      [0, 1, 2], // Top row
+      [3, 4, 5], // Middle row
+      [6, 7, 8], // Bottom row
+      [0, 3, 6], // First column
+      [1, 4, 7], // Second column
+      [2, 5, 8], // Third column
+      [0, 4, 8], // Diagonal from top-left to bottom-right
+      [2, 4, 6], // Diagonal from top-right to bottom-left
     ];
 
     for (let i = 0; i < winPatterns.length; i++) {
       const [a, b, c] = winPatterns[i];
-      if (
-        board[a] !== null &&
-        board[a] === board[b] &&
-        board[a] === board[c]
-      ) {
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
         return board[a];
       }
     }
@@ -62,31 +81,42 @@ const handleCellClick = (index) => {
     return null;
   };
 
+  useEffect(() => {
+    if (gameEnded) {
+      if (winner) {
+        setTimeout(() => {
+          alert(`Winner: ${winner}`);
+          resetGame();
+        }, 500); // Delay winner alert for visual effect
+      } else {
+        setTimeout(() => {
+          alert('Draw');
+          resetGame();
+        }, 500); // Delay draw alert for visual effect
+      }
+    }
+  }, [gameEnded, winner]);
+
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setCurrentPlayer('X');
+    setWinner(null);
+    setGameEnded(false);
+  };
+
   const renderCell = (index) => {
     const cellValue = board[index];
 
     return (
-      <TouchableOpacity
-        onPress={() => handleCellClick(index)}
-        key={index}
-      >
+      <TouchableOpacity key={index} onPress={() => handleCellClick(index)}>
         <Text style={styles.cellStyle}>{cellValue}</Text>
       </TouchableOpacity>
     );
   };
 
-  const renderWinnerMessage = () => {
-    if (winner) {
-      Alert.alert(`Winner: ${winner}`);
-    }
-
-    return null;
-  };
-
   return (
     <View style={styles.container}>
       {board.map((_, index) => renderCell(index))}
-      {renderWinnerMessage()}
     </View>
   );
 };
@@ -119,4 +149,3 @@ const styles = StyleSheet.create({
 });
 
 export default GameBoard;
-
