@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: '#000',
     borderWidth: 1,
+    margin: 5,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#2986cc',

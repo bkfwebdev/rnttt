@@ -1,11 +1,17 @@
 {
   "expo": {
     "name": "rnFirebaseAuth",
-    "slug": "rnFirebaseAuth",
+    "slug": "react-native-arcade",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3068acad-a928-42bc-95dd-a3139594a50d"
+      }
+    },
+    "owner": "bkfwebdev"
   },
   "name": "rnFirebaseAuth"
 }
